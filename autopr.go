@@ -25,8 +25,6 @@ var jiraToken = os.Getenv("JIRA_TOKEN")
 var targetGithubOrg = os.Getenv("TARGET_GITHUB_ORG")
 var sourceGithubOrg = os.Getenv("SOURCE_GITHUB_ORG")
 var targetGithubRepo = os.Getenv("TARGET_GITHUB_REPO")
-
-// not really secrets but stuff where you're gonna want different values than me
 var jiraAccountId = os.Getenv("JIRA_ACCOUNT_ID")
 var jiraUsername = os.Getenv("JIRA_USER_NAME")
 var jiraUrl = os.Getenv("JIRA_URL")
