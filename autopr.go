@@ -32,7 +32,7 @@ var jiraProjectName = os.Getenv("JIRA_PROJECT_NAME")
 var jiraBoardID = os.Getenv("JIRA_BOARD_ID")
 var jiraSprintFieldName = os.Getenv("JIRA_SPRINT_FIELD_NAME")
 
-const jiraIssueType = "Chore"
+const jiraIssueType = "Technical Task"
 const targetGithubBranch = "main"
 
 func main() {
@@ -70,10 +70,14 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+		if err := transitionIssueToDeveloping(ctx, jiraClient, issue); err != nil {
+			panic(err)
+		}
 		if err := addIssueKeyToCommit(ctx, commitInfo, issue.Key); err != nil {
 			panic(err)
 		}
 	}
+
 	if err := forcePushBranch(ctx, commitInfo.Branch); err != nil {
 		panic(err)
 	}
@@ -151,9 +155,6 @@ func createIssue(ctx context.Context, jiraClient *jira.Client, commitInfo *commi
 			Assignee: &jira.User{
 				AccountID: jiraAccountId,
 			},
-			Reporter: &jira.User{
-				AccountID: jiraAccountId,
-			},
 			Description: commitInfo.Body,
 			Type: jira.IssueType{
 				Name: jiraIssueType,
@@ -168,6 +169,19 @@ func createIssue(ctx context.Context, jiraClient *jira.Client, commitInfo *commi
 
 	issue, _, err := jiraClient.Issue.CreateWithContext(ctx, &i)
 	return issue, err
+}
+
+func transitionIssueToDeveloping(ctx context.Context, jiraClient *jira.Client, issue *jira.Issue) error {
+	// move to "ready for development"
+	if _, err := jiraClient.Issue.DoTransitionWithContext(ctx, issue.ID, "101"); err != nil {
+		fmt.Println("failed to transition to ready for dev")
+		return fmt.Errorf("failed to transition to ready for dev: %w", err)
+	}
+	// move to "developing"
+	if _, err := jiraClient.Issue.DoTransitionWithContext(ctx, issue.ID, "121"); err != nil {
+		return fmt.Errorf("failed to transition to developing: %w", err)
+	}
+	return nil
 }
 
 func addIssueKeyToCommit(ctx context.Context, commitInfo *commitInfo, issueKey string) error {
