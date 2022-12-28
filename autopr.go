@@ -172,12 +172,6 @@ func createIssue(ctx context.Context, jiraClient *jira.Client, commitInfo *commi
 }
 
 func transitionIssueToDeveloping(ctx context.Context, jiraClient *jira.Client, issue *jira.Issue) error {
-	// move to "ready for development"
-	if _, err := jiraClient.Issue.DoTransitionWithContext(ctx, issue.ID, "101"); err != nil {
-		fmt.Println("failed to transition to ready for dev")
-		return fmt.Errorf("failed to transition to ready for dev: %w", err)
-	}
-	// move to "developing"
 	if _, err := jiraClient.Issue.DoTransitionWithContext(ctx, issue.ID, "121"); err != nil {
 		return fmt.Errorf("failed to transition to developing: %w", err)
 	}
