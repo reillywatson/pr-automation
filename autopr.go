@@ -31,6 +31,7 @@ var jiraUrl = os.Getenv("JIRA_URL")
 var jiraProjectName = os.Getenv("JIRA_PROJECT_NAME")
 var jiraBoardID = os.Getenv("JIRA_BOARD_ID")
 var jiraSprintFieldName = os.Getenv("JIRA_SPRINT_FIELD_NAME")
+var jiraParentId = os.Getenv("JIRA_PARENT_ID")
 
 const jiraIssueType = "Technical Task"
 const targetGithubBranch = "main"
@@ -165,6 +166,9 @@ func createIssue(ctx context.Context, jiraClient *jira.Client, commitInfo *commi
 			Summary:  commitInfo.Title,
 			Unknowns: extraFields,
 		},
+	}
+	if jiraParentId != "" {
+		i.Fields.Parent = &jira.Parent{ID: jiraParentId}
 	}
 
 	issue, _, err := jiraClient.Issue.CreateWithContext(ctx, &i)
