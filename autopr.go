@@ -17,6 +17,8 @@ import (
 
 var addToCurrentSprintFlag = flag.Bool("addToCurrentSprint", false, "add the ticket to the current sprint")
 
+var noPR = flag.Bool("nopr", false, "just make a ticket, don't open a PR")
+
 // secrets!
 var githubToken = os.Getenv("GITHUB_TOKEN")
 var jiraToken = os.Getenv("JIRA_TOKEN")
@@ -65,7 +67,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if match := regexp.MustCompile(fmt.Sprintf(`^%s-\d+`, jiraProjectName)).FindStringSubmatch(commitInfo.Title); len(match) == 0 {
+	if match := regexp.MustCompile(`^[A-Z]+-\d+`).FindStringSubmatch(commitInfo.Title); len(match) == 0 {
 		// we don't have an issue number in the commit title, better create a JIRA ticket!
 		issue, err := createIssue(ctx, jiraClient, commitInfo, *addToCurrentSprintFlag)
 		if err != nil {
@@ -82,11 +84,13 @@ func main() {
 	if err := forcePushBranch(ctx, commitInfo.Branch); err != nil {
 		panic(err)
 	}
-	url, err := createPR(ctx, githubClient, commitInfo)
-	if err != nil {
-		panic(err)
+	if !*noPR {
+		url, err := createPR(ctx, githubClient, commitInfo)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("PR:", url)
 	}
-	fmt.Println("PR:", url)
 }
 
 func createPR(ctx context.Context, githubClient *github.Client, commitInfo *commitInfo) (string, error) {
