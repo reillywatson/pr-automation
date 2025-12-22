@@ -17,6 +17,8 @@ import (
 
 var addToCurrentSprintFlag = flag.Bool("addToCurrentSprint", false, "add the ticket to the current sprint")
 
+var asDraft = flag.Bool("draft", false, "open PR as draft")
+
 var noPR = flag.Bool("nopr", false, "just make a ticket, don't open a PR")
 
 // secrets!
@@ -39,6 +41,8 @@ const jiraIssueType = "Technical Task"
 const targetGithubBranch = "main"
 
 func main() {
+	flag.Parse()
+	fmt.Println("AS DRAFT:", *asDraft)
 	if githubToken == "" {
 		fmt.Println("GITHUB_TOKEN env var must be set")
 		os.Exit(1)
@@ -99,6 +103,7 @@ func createPR(ctx context.Context, githubClient *github.Client, commitInfo *comm
 		Head:  stringPtr(fmt.Sprintf("%s:%s", sourceGithubOrg, commitInfo.Branch)),
 		Base:  stringPtr(targetGithubBranch),
 		Body:  &commitInfo.Body,
+		Draft: asDraft,
 	})
 	if err != nil {
 		return "", err
