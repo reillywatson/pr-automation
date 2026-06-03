@@ -193,7 +193,7 @@ func transitionIssueToDeveloping(ctx context.Context, jiraClient *jira.Client, i
 
 func addIssueKeyToCommit(ctx context.Context, commitInfo *commitInfo, issueKey string) error {
 	commitInfo.Title = fmt.Sprintf("%s: %s", issueKey, commitInfo.Title)
-	return exec.Command("git", "commit", "--amend", "-m", fmt.Sprintf("%s\n\n%s", commitInfo.Title, commitInfo.Body)).Run()
+	return exec.Command("git", "commit", "--no-verify", "--amend", "-m", fmt.Sprintf("%s\n\n%s", commitInfo.Title, commitInfo.Body)).Run()
 }
 
 func stringPtr(s string) *string { return &s }
