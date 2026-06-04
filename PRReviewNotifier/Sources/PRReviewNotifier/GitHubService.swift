@@ -140,6 +140,7 @@ class GitHubService {
                   id
                   isResolved
                   isOutdated
+                  line
                   comments(first: 100) {
                     nodes {
                       databaseId
@@ -217,6 +218,7 @@ class GitHubService {
                       id
                       isResolved
                       isOutdated
+                      line
                       comments(first: 100) {
                         nodes {
                           databaseId

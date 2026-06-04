@@ -500,12 +500,16 @@ class PRMonitor: ObservableObject {
 
         if !aiThreads.isEmpty {
             return aiThreads.allSatisfy { thread in
-                thread.isResolved || thread.isOutdated || hasNonAIReply(in: thread)
+                thread.isResolved || isUIOutdated(thread) || hasNonAIReply(in: thread)
             }
         }
 
         // A review with no inline threads is trivially satisfied.
         return true
+    }
+
+    private func isUIOutdated(_ thread: ReviewThread) -> Bool {
+        thread.isOutdated && thread.line == nil
     }
 
     private func hasNonAIReply(in thread: ReviewThread) -> Bool {

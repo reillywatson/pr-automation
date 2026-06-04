@@ -109,6 +109,7 @@ struct ReviewThread: Codable {
     let id: String
     let isResolved: Bool
     let isOutdated: Bool
+    let line: Int?
     let comments: ReviewThreadComments
 }
 
